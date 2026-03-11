@@ -9,6 +9,7 @@ class ProductModel extends Product {
     required super.title,
     required super.price,
     required super.image,
+    super.favorite = false,
   });
 
   /// Cria um [ProductModel] a partir de um mapa JSON.
@@ -55,17 +56,27 @@ class ProductModel extends Product {
       throw FormatException('Field "image" must be a string, got: ${image.runtimeType}');
     }
 
+    // Obtém o campo 'favorite' (opcional, padrão false)
+    final favorite = json['favorite'] as bool? ?? false;
+
     return ProductModel(
       id: id,
       title: title,
       price: price.toDouble(),
       image: image,
+      favorite: favorite,
     );
   }
 
   /// Converte este [ProductModel] para um mapa JSON.
   Map<String, dynamic> toJson() {
-    return {'id': id, 'title': title, 'price': price, 'image': image};
+    return {
+      'id': id,
+      'title': title,
+      'price': price,
+      'image': image,
+      'favorite': favorite,
+    };
   }
 
   /// Cria um [ProductModel] a partir de uma entidade de domínio [Product].
@@ -75,12 +86,19 @@ class ProductModel extends Product {
       title: product.title,
       price: product.price,
       image: product.image,
+      favorite: product.favorite,
     );
   }
 
   /// Converte este modelo para uma entidade de domínio [Product].
   Product toEntity() {
-    return Product(id: id, title: title, price: price, image: image);
+    return Product(
+      id: id,
+      title: title,
+      price: price,
+      image: image,
+      favorite: favorite,
+    );
   }
 }
 
