@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../viewmodels/product_viewmodel.dart';
 import '../widgets/product_tile.dart';
+import 'product_details_page.dart';
 
 /// Página principal que exibe a lista de produtos.
 /// Usa ValueListenableBuilder para observar mudanças de estado do ViewModel.
@@ -25,13 +26,13 @@ class ProductPage extends StatelessWidget {
               return IconButton(
                 onPressed: () => viewModel.toggleFavoritesFilter(),
                 icon: Icon(
-                  state.showOnlyFavorites 
-                      ? Icons.favorite 
+                  state.showOnlyFavorites
+                      ? Icons.favorite
                       : Icons.favorite_border,
                   color: state.showOnlyFavorites ? Colors.red : null,
                 ),
-                tooltip: state.showOnlyFavorites 
-                    ? 'Mostrar todos' 
+                tooltip: state.showOnlyFavorites
+                    ? 'Mostrar todos'
                     : 'Filtrar favoritos',
               );
             },
@@ -121,7 +122,7 @@ class ProductPage extends StatelessWidget {
                 ),
               );
             }
-            
+
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -155,6 +156,15 @@ class ProductPage extends StatelessWidget {
               return ProductTile(
                 product: product,
                 onFavoriteToggle: () => viewModel.toggleFavorite(product.id),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ProductDetailsPage(product: product),
+                    ),
+                  );
+                },
               );
             },
           );
@@ -168,4 +178,3 @@ class ProductPage extends StatelessWidget {
     );
   }
 }
-
