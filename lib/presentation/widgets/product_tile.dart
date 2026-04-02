@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/product.dart';
 
 /// Widget reutilizável que exibe um único produto em um layout de tile.
-/// Exibe a imagem, título, preço formatado e botão de favorito.
-/// Ao clicar no tile, navega para a tela de detalhes do produto.
+/// Exibe a imagem, título, preço formatado e botões de ação.
 class ProductTile extends StatelessWidget {
   /// O produto a ser exibido.
   final Product product;
@@ -14,12 +13,20 @@ class ProductTile extends StatelessWidget {
   /// Callback chamado quando o tile é clicado.
   final VoidCallback? onTap;
 
+  /// Callback chamado quando o botão de editar é pressionado.
+  final VoidCallback? onEdit;
+
+  /// Callback chamado quando o botão de excluir é pressionado.
+  final VoidCallback? onDelete;
+
   /// Cria um ProductTile com o produto informado.
   const ProductTile({
     super.key,
     required this.product,
     this.onFavoriteToggle,
     this.onTap,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -85,17 +92,45 @@ class ProductTile extends StatelessWidget {
                   ],
                 ),
               ),
-              // Botão de favorito
-              IconButton(
-                onPressed: onFavoriteToggle,
-                icon: Icon(
-                  product.favorite ? Icons.star : Icons.star_border,
-                  color: product.favorite ? Colors.amber[700] : Colors.grey,
-                  size: 32,
-                ),
-                tooltip: product.favorite
-                    ? 'Remover dos favoritos'
-                    : 'Adicionar aos favoritos',
+              // Botões de ação
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: onFavoriteToggle,
+                    icon: Icon(
+                      product.favorite ? Icons.star : Icons.star_border,
+                      color: product.favorite ? Colors.amber[700] : Colors.grey,
+                    ),
+                    tooltip: product.favorite
+                        ? 'Remover dos favoritos'
+                        : 'Adicionar aos favoritos',
+                    iconSize: 24,
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(4),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: onEdit,
+                        icon: Icon(Icons.edit, color: Colors.blue[600]),
+                        tooltip: 'Editar',
+                        iconSize: 20,
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(4),
+                      ),
+                      IconButton(
+                        onPressed: onDelete,
+                        icon: Icon(Icons.delete, color: Colors.red[600]),
+                        tooltip: 'Excluir',
+                        iconSize: 20,
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(4),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

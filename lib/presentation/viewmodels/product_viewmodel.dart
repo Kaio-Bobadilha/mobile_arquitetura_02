@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../core/errors/failure.dart';
+import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import 'product_state.dart';
 
@@ -43,6 +44,76 @@ class ProductViewModel {
       _state.value = _state.value.copyWith(
         isLoading: false,
         error: 'Não foi possível carregar os produtos',
+      );
+    }
+  }
+
+  /// Adiciona um novo produto.
+  /// Atualiza a lista local após sucesso na API.
+  Future<void> addProduct(Product product) async {
+    _state.value = _state.value.copyWith(isLoading: true, error: null);
+
+    try {
+      final newProduct = await _repository.addProduct(product);
+      final updatedProducts = [..._state.value.products, newProduct];
+      _state.value = _state.value.copyWith(
+        isLoading: false,
+        products: updatedProducts,
+      );
+    } on Failure catch (e) {
+      _state.value = _state.value.copyWith(isLoading: false, error: e.message);
+    } catch (e) {
+      _state.value = _state.value.copyWith(
+        isLoading: false,
+        error: 'Não foi possível adicionar o produto',
+      );
+    }
+  }
+
+  /// Atualiza um produto existente.
+  /// Atualiza a lista local após sucesso na API.
+  Future<void> updateProduct(Product product) async {
+    _state.value = _state.value.copyWith(isLoading: true, error: null);
+
+    try {
+      final updatedProduct = await _repository.updateProduct(product);
+      final updatedProducts = _state.value.products.map((p) {
+        return p.id == updatedProduct.id ? updatedProduct : p;
+      }).toList();
+      _state.value = _state.value.copyWith(
+        isLoading: false,
+        products: updatedProducts,
+      );
+    } on Failure catch (e) {
+      _state.value = _state.value.copyWith(isLoading: false, error: e.message);
+    } catch (e) {
+      _state.value = _state.value.copyWith(
+        isLoading: false,
+        error: 'Não foi possível atualizar o produto',
+      );
+    }
+  }
+
+  /// Remove um produto pelo ID.
+  /// Remove da lista local após sucesso na API.
+  Future<void> deleteProduct(int id) async {
+    _state.value = _state.value.copyWith(isLoading: true, error: null);
+
+    try {
+      await _repository.deleteProduct(id);
+      final updatedProducts = _state.value.products
+          .where((p) => p.id != id)
+          .toList();
+      _state.value = _state.value.copyWith(
+        isLoading: false,
+        products: updatedProducts,
+      );
+    } on Failure catch (e) {
+      _state.value = _state.value.copyWith(isLoading: false, error: e.message);
+    } catch (e) {
+      _state.value = _state.value.copyWith(
+        isLoading: false,
+        error: 'Não foi possível remover o produto',
       );
     }
   }

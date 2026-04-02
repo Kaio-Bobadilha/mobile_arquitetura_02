@@ -25,5 +25,32 @@ class ProductRemoteDatasource {
       throw Exception('Invalid response format');
     }
   }
+
+  /// Adiciona um novo produto via POST.
+  /// Retorna o [ProductModel] criado pela API.
+  Future<ProductModel> addProduct(ProductModel product) async {
+    final response = await _httpClient.post(
+      '$_baseUrl/products',
+      product.toJson(),
+    );
+
+    return ProductModel.fromJson(response as Map<String, dynamic>);
+  }
+
+  /// Atualiza um produto existente via PUT.
+  /// Retorna o [ProductModel] atualizado pela API.
+  Future<ProductModel> updateProduct(ProductModel product) async {
+    final response = await _httpClient.put(
+      '$_baseUrl/products/${product.id}',
+      product.toJson(),
+    );
+
+    return ProductModel.fromJson(response as Map<String, dynamic>);
+  }
+
+  /// Remove um produto via DELETE.
+  Future<void> deleteProduct(int id) async {
+    await _httpClient.delete('$_baseUrl/products/$id');
+  }
 }
 

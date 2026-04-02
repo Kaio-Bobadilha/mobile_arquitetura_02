@@ -1,6 +1,7 @@
 import '../../core/errors/failure.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
+import '../models/product_model.dart';
 import '../datasources/product_remote_datasource.dart';
 import '../datasources/product_cache_datasource.dart';
 
@@ -23,34 +24,58 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<List<Product>> getProducts() async {
     try {
-      // Tenta buscar da fonte remota
       final products = await _remoteDatasource.getProducts();
-
-      // Salva no cache para uso futuro
       _cacheDatasource.save(products);
-
       return products.map((model) => model.toEntity()).toList();
     } on Failure {
-      // Se a fonte remota falhar, tenta obter do cache
       final cachedProducts = _cacheDatasource.get();
-
       if (cachedProducts != null && cachedProducts.isNotEmpty) {
-        // Retorna dados em cache se disponível
         return cachedProducts.map((model) => model.toEntity()).toList();
       }
-
-      // Relança a falha original se não houver cache disponível
       rethrow;
     } catch (e) {
-      // Tenta usar cache em qualquer outra exceção
       final cachedProducts = _cacheDatasource.get();
-
       if (cachedProducts != null && cachedProducts.isNotEmpty) {
         return cachedProducts.map((model) => model.toEntity()).toList();
       }
-
-      // Converte para Failure se ainda não for
       throw Failure('Failed to load products: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<Product> addProduct(Product product) async {
+    try {
+      final model = ProductModel.fromEntity(product);
+      final result = await _remoteDatasource.addProduct(model);
+      return result.toEntity();
+    } on Failure {
+      rethrow;
+    } catch (e) {
+      throw Failure('Falha ao adicionar produto: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<Product> updateProduct(Product product) async {
+    try {
+      final model = ProductModel.fromEntity(product);
+      final result = await _remoteDatasource.updateProduct(model);
+      return result.toEntity();
+    } on Failure {
+      rethrow;
+    } catch (e) {
+      throw Failure('Falha ao atualizar produto: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> deleteProduct(int id) async {
+    try {
+      await _remoteDatasource.deleteProduct(id);
+    } on Failure {
+      rethrow;
+    } catch (e) {
+      throw Failure('Falha ao remover produto: ${e.toString()}');
     }
   }
 }
