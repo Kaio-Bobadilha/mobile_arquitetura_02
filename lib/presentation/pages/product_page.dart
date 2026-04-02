@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../domain/entities/product.dart';
 import '../viewmodels/product_viewmodel.dart';
 import '../widgets/product_tile.dart';
 import 'product_details_page.dart';
+import 'product_form_page.dart';
 
 /// Página principal que exibe a lista de produtos.
 /// Usa ValueListenableBuilder para observar mudanças de estado do ViewModel.
@@ -165,15 +167,74 @@ class ProductPage extends StatelessWidget {
                     ),
                   );
                 },
+                onEdit: () => _navigateToForm(context, product: product),
+                onDelete: () => _confirmDelete(context, product),
               );
             },
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => viewModel.loadProducts(),
-        tooltip: 'Atualizar',
-        child: const Icon(Icons.refresh),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            heroTag: 'refresh',
+            onPressed: () => viewModel.loadProducts(),
+            tooltip: 'Atualizar',
+            mini: true,
+            child: const Icon(Icons.refresh),
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton(
+            heroTag: 'add',
+            onPressed: () => _navigateToForm(context),
+            tooltip: 'Adicionar Produto',
+            child: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Navega para o formulário de cadastro ou edição.
+  void _navigateToForm(BuildContext context, {Product? product}) async {
+    final result = await Navigator.push<Product>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductFormPage(product: product),
+      ),
+    );
+
+    if (result != null) {
+      if (product != null) {
+        viewModel.updateProduct(result);
+      } else {
+        viewModel.addProduct(result);
+      }
+    }
+  }
+
+  /// Exibe diálogo de confirmação para excluir um produto.
+  void _confirmDelete(BuildContext context, Product product) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Excluir Produto'),
+        content: Text('Deseja realmente excluir "${product.title}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              viewModel.deleteProduct(product.id);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Excluir'),
+          ),
+        ],
       ),
     );
   }

@@ -138,10 +138,10 @@ void main() {
       await viewModel.loadProducts();
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(find.byType(FloatingActionButton), findsOneWidget);
-      // There may be multiple refresh icons (one in FAB and one in error/empty state buttons)
+      // Assert - agora temos 2 FABs (refresh e add)
+      expect(find.byType(FloatingActionButton), findsNWidgets(2));
       expect(find.byIcon(Icons.refresh), findsAtLeast(1));
+      expect(find.byIcon(Icons.add), findsOneWidget);
 
       // Cleanup
       viewModel.dispose();

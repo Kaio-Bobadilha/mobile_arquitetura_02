@@ -151,7 +151,7 @@ class ProductDetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
 
-                  // Descrição (placeholder, já que a API não fornece)
+                  // Descrição do produto
                   Text(
                     'Descrição',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -160,8 +160,9 @@ class ProductDetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Este é um produto de qualidade adquirido através de nossa API integrada. '
-                    'Para mais informações sobre este produto, entre em contato com nosso suporte.',
+                    product.description.isNotEmpty
+                        ? product.description
+                        : 'Sem descrição disponível.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.grey[700],
                       height: 1.5,

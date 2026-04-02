@@ -10,6 +10,9 @@ class Product {
   /// Preço do produto.
   final double price;
 
+  /// Descrição do produto.
+  final String description;
+
   /// String da URL da imagem do produto.
   final String image;
 
@@ -21,6 +24,7 @@ class Product {
     required this.id,
     required this.title,
     required this.price,
+    this.description = '',
     required this.image,
     this.favorite = false,
   });
@@ -30,6 +34,7 @@ class Product {
     int? id,
     String? title,
     double? price,
+    String? description,
     String? image,
     bool? favorite,
   }) {
@@ -37,6 +42,7 @@ class Product {
       id: id ?? this.id,
       title: title ?? this.title,
       price: price ?? this.price,
+      description: description ?? this.description,
       image: image ?? this.image,
       favorite: favorite ?? this.favorite,
     );
@@ -50,14 +56,15 @@ class Product {
           id == other.id &&
           title == other.title &&
           price == other.price &&
+          description == other.description &&
           image == other.image &&
           favorite == other.favorite;
 
   @override
-  int get hashCode => Object.hash(id, title, price, image, favorite);
+  int get hashCode => Object.hash(id, title, price, description, image, favorite);
 
   @override
   String toString() =>
-      'Product(id: $id, title: $title, price: $price, image: $image, favorite: $favorite)';
+      'Product(id: $id, title: $title, price: $price, description: $description, image: $image, favorite: $favorite)';
 }
 
