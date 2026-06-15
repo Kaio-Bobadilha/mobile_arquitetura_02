@@ -1,4 +1,5 @@
 import '../../domain/entities/product.dart';
+import '../../core/utils/translator.dart';
 
 /// Modelo de dados para Product com serialização/deserialização JSON.
 /// Estende a entidade de domínio [Product] com capacidades da camada de dados.
@@ -16,60 +17,17 @@ class ProductModel extends Product {
   /// Cria um [ProductModel] a partir de um mapa JSON.
   /// Lança [FormatException] caso o JSON seja inválido ou ausente campos obrigatórios.
   factory ProductModel.fromJson(Map<String, dynamic> json) {
-    // Valida se o JSON não é nulo
     if (json == null) {
       throw const FormatException('JSON cannot be null');
     }
 
-    // Valida e obtém o campo 'id'
-    final id = json['id'];
-    if (id == null) {
-      throw const FormatException('Field "id" is required');
-    }
-    if (id is! int) {
-      throw FormatException('Field "id" must be an integer, got: ${id.runtimeType}');
-    }
-
-    // Valida e obtém o campo 'title'
-    final title = json['title'];
-    if (title == null) {
-      throw const FormatException('Field "title" is required');
-    }
-    if (title is! String) {
-      throw FormatException('Field "title" must be a string, got: ${title.runtimeType}');
-    }
-
-    // Valida e obtém o campo 'price'
-    final price = json['price'];
-    if (price == null) {
-      throw const FormatException('Field "price" is required');
-    }
-    if (price is! num) {
-      throw FormatException('Field "price" must be a number, got: ${price.runtimeType}');
-    }
-
-    // Valida e obtém o campo 'image'
-    final image = json['image'];
-    if (image == null) {
-      throw const FormatException('Field "image" is required');
-    }
-    if (image is! String) {
-      throw FormatException('Field "image" must be a string, got: ${image.runtimeType}');
-    }
-
-    // Obtém o campo 'description' (opcional, padrão vazio)
-    final description = json['description'] as String? ?? '';
-
-    // Obtém o campo 'favorite' (opcional, padrão false)
-    final favorite = json['favorite'] as bool? ?? false;
-
     return ProductModel(
-      id: id,
-      title: title,
-      price: price.toDouble(),
-      description: description,
-      image: image,
-      favorite: favorite,
+      id: json['id'] as int? ?? 0,
+      title: Translator.translateProduct(json['title'] as String? ?? 'Produto sem título'),
+      price: (json['price'] as num? ?? 0.0).toDouble(),
+      description: Translator.translateProduct(json['description'] as String? ?? ''),
+      image: json['image'] as String? ?? 'https://via.placeholder.com/150',
+      favorite: json['favorite'] as bool? ?? false,
     );
   }
 

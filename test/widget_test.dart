@@ -92,8 +92,8 @@ void main() {
       // Assert - should show products
       expect(find.text('Product 1'), findsOneWidget);
       expect(find.text('Product 2'), findsOneWidget);
-      expect(find.text('\$10.00'), findsOneWidget);
-      expect(find.text('\$20.00'), findsOneWidget);
+      expect(find.text('R\$ 10.00'), findsOneWidget);
+      expect(find.text('R\$ 20.00'), findsOneWidget);
 
       // Cleanup
       viewModel.dispose();

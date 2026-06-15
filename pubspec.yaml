@@ -37,6 +37,12 @@ dependencies:
 
   # HTTP client for making network requests
   http: ^1.2.0
+  
+  # Persistent storage for session and user data
+  shared_preferences: ^2.5.5
+
+  # Collection utilities for advanced list operations
+  collection: ^1.9.0
 
 dev_dependencies:
   flutter_test:

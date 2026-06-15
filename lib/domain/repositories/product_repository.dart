@@ -6,6 +6,9 @@ abstract class ProductRepository {
   /// Busca a lista de todos os produtos.
   Future<List<Product>> getProducts();
 
+  /// Busca um produto específico pelo [id].
+  Future<Product> getProductById(int id);
+
   /// Adiciona um novo produto.
   /// Retorna o [Product] criado.
   Future<Product> addProduct(Product product);
@@ -16,5 +19,11 @@ abstract class ProductRepository {
 
   /// Remove um produto pelo [id].
   Future<void> deleteProduct(int id);
+
+  /// Salva a lista de IDs de produtos favoritos.
+  Future<void> saveFavorites(List<int> favoriteIds);
+
+  /// Recupera a lista de IDs de produtos favoritos.
+  List<int> getFavorites();
 }
 

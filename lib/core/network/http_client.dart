@@ -12,14 +12,23 @@ class HttpClient {
   /// Se nenhum cliente for fornecido, um padrão é criado.
   HttpClient({http.Client? client}) : _client = client ?? http.Client();
 
+  /// Retorna os headers padrão para requisições HTTP
+  Map<String, String> _getDefaultHeaders({Map<String, String>? customHeaders}) {
+    final headers = {'Content-Type': 'application/json'};
+    if (customHeaders != null) {
+      headers.addAll(customHeaders);
+    }
+    return headers;
+  }
+
   /// Executa uma requisição GET para a URL informada.
   /// Retorna o corpo da resposta como dynamic (Map ou List).
   /// Lança [Failure] se a requisição falhar.
-  Future<dynamic> get(String url) async {
+  Future<dynamic> get(String url, {Map<String, String>? headers}) async {
     try {
       final response = await _client.get(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getDefaultHeaders(customHeaders: headers),
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -37,11 +46,15 @@ class HttpClient {
   /// Executa uma requisição POST para a URL informada com o corpo fornecido.
   /// Retorna o corpo da resposta como dynamic (Map ou List).
   /// Lança [Failure] se a requisição falhar.
-  Future<dynamic> post(String url, Map<String, dynamic> body) async {
+  Future<dynamic> post(
+    String url,
+    Map<String, dynamic> body, {
+    Map<String, String>? headers,
+  }) async {
     try {
       final response = await _client.post(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getDefaultHeaders(customHeaders: headers),
         body: json.encode(body),
       );
 
@@ -60,11 +73,15 @@ class HttpClient {
   /// Executa uma requisição PUT para a URL informada com o corpo fornecido.
   /// Retorna o corpo da resposta como dynamic (Map ou List).
   /// Lança [Failure] se a requisição falhar.
-  Future<dynamic> put(String url, Map<String, dynamic> body) async {
+  Future<dynamic> put(
+    String url,
+    Map<String, dynamic> body, {
+    Map<String, String>? headers,
+  }) async {
     try {
       final response = await _client.put(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getDefaultHeaders(customHeaders: headers),
         body: json.encode(body),
       );
 
@@ -83,11 +100,11 @@ class HttpClient {
   /// Executa uma requisição DELETE para a URL informada.
   /// Retorna o corpo da resposta como dynamic (Map ou List).
   /// Lança [Failure] se a requisição falhar.
-  Future<dynamic> delete(String url) async {
+  Future<dynamic> delete(String url, {Map<String, String>? headers}) async {
     try {
       final response = await _client.delete(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getDefaultHeaders(customHeaders: headers),
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -107,4 +124,3 @@ class HttpClient {
     _client.close();
   }
 }
-

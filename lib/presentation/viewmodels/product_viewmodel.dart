@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 import '../../core/errors/failure.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
@@ -24,27 +25,47 @@ class ProductViewModel {
   /// Carrega produtos do repositório.
   /// Atualiza o estado para carregando, então sucesso ou erro conforme o resultado.
   Future<void> loadProducts() async {
-    // Define estado de carregamento
     _state.value = _state.value.copyWith(isLoading: true, error: null);
 
     try {
       final products = await _repository.getProducts();
+      final favoriteIds = _repository.getFavorites();
 
-      // Define estado de sucesso com produtos
+      // Mescla os favoritos persistidos com os produtos da API
+      final productsWithFavorites = products.map((p) {
+        return p.copyWith(favorite: favoriteIds.contains(p.id));
+      }).toList();
+
       _state.value = _state.value.copyWith(
         isLoading: false,
-        products: products,
+        products: productsWithFavorites,
         error: null,
       );
     } on Failure catch (e) {
-      // Define estado de erro com mensagem de falha
-      _state.value = _state.value.copyWith(isLoading: false, error: e.message);
+      String friendlyMessage = e.message;
+      if (e.message.contains('format')) {
+        friendlyMessage = 'Erro ao processar os dados dos produtos';
+      }
+      _state.value = _state.value.copyWith(isLoading: false, error: friendlyMessage);
     } catch (e) {
-      // Define estado de erro com mensagem genérica
       _state.value = _state.value.copyWith(
         isLoading: false,
-        error: 'Não foi possível carregar os produtos',
+        error: 'Não foi possível carregar os produtos no momento',
       );
+    }
+  }
+
+  /// Busca um produto específico por ID.
+  /// Tenta primeiro na lista local, senão busca no repositório.
+  Future<Product?> getProduct(int id) async {
+    // Tenta encontrar na lista local primeiro
+    final localProduct = _state.value.products.firstWhereOrNull((p) => p.id == id);
+    if (localProduct != null) return localProduct;
+
+    try {
+      return await _repository.getProductById(id);
+    } catch (e) {
+      return null;
     }
   }
 
@@ -122,15 +143,21 @@ class ProductViewModel {
   /// Atualiza a interface automaticamente através do ValueNotifier.
   void toggleFavorite(int productId) {
     final currentProducts = _state.value.products;
-    
+
     // Atualiza a lista de produtos com o favorito alternado
     final updatedProducts = currentProducts.map((product) {
       if (product.id == productId) {
-        // Cria uma cópia com o favorito alternado
         return product.copyWith(favorite: !product.favorite);
       }
       return product;
     }).toList();
+
+    // Persiste os IDs dos favoritos no SessionManager
+    final favoriteIds = updatedProducts
+        .where((p) => p.favorite)
+        .map((p) => p.id)
+        .toList();
+    _repository.saveFavorites(favoriteIds);
 
     // Atualiza o estado com a nova lista de produtos
     _state.value = _state.value.copyWith(products: updatedProducts);
